@@ -171,8 +171,18 @@ func matchMP4(data []byte) (string, string) {
 			// minor version number
 			continue
 		}
-		if bytes.Equal(data[st:st+3], []byte("mp4")) ||
-			bytes.Equal(data[st:st+4], []byte("dash")) {
+		brand := data[st : st+4]
+		// Match mp4* brands (mp41, mp42, etc.)
+		if bytes.Equal(brand[:3], []byte("mp4")) {
+			return "video/mp4", "mp4"
+		}
+		// Match dash brand
+		if bytes.Equal(brand, []byte("dash")) {
+			return "video/mp4", "mp4"
+		}
+		// Match ISO base media format brands (isom, iso2-iso9)
+		// These indicate ISO 14496-12 compatible files (MP4 container)
+		if bytes.Equal(brand[:3], []byte("iso")) {
 			return "video/mp4", "mp4"
 		}
 	}
